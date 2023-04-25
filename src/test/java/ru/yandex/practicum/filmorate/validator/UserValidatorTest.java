@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.validator;
 
 import org.junit.jupiter.api.*;
 import ru.yandex.practicum.filmorate.controller.UserController;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
@@ -25,15 +25,15 @@ class UserValidatorTest {
     @DisplayName("Проверка создания пользователя, если неправильный или пустой email")
     void shouldThrowExceptionWhenCreateUserWithWrongEmail() {
         user.setEmail(" ");
-        ValidationException exception = Assertions.assertThrows(
-                ValidationException.class,
+        BadRequestException exception = Assertions.assertThrows(
+                BadRequestException.class,
                 () -> userController.create(user));
         assertEquals("Электронная почта не может быть пустой и должна содержать символ @", exception.getMessage());
         assertEquals(0, userController.findAll().size(), "Пользователь не должен быть создан");
 
         user.setEmail("email1.email.ru");
-        ValidationException exception1 = Assertions.assertThrows(
-                ValidationException.class,
+        BadRequestException exception1 = Assertions.assertThrows(
+                BadRequestException.class,
                 () -> userController.create(user));
         assertEquals("Электронная почта не может быть пустой и должна содержать символ @", exception1.getMessage());
         assertEquals(0, userController.findAll().size(), "Пользователь не должен быть создан");
@@ -43,15 +43,15 @@ class UserValidatorTest {
     @DisplayName("Проверка создания пользователя, если пустой логин или с пробелом")
     void shouldThrowExceptionWhenCreateUserWithWrongLogin() {
         user.setLogin(" ");
-        ValidationException exception = Assertions.assertThrows(
-                ValidationException.class,
+        BadRequestException exception = Assertions.assertThrows(
+                BadRequestException.class,
                 () -> userController.create(user));
         assertEquals("Логин не может быть пустым и содержать пробелы", exception.getMessage());
         assertEquals(0, userController.findAll().size(), "Пользователь не должен быть создан");
 
         user.setLogin("Log in 1");
-        ValidationException exception1 = Assertions.assertThrows(
-                ValidationException.class,
+        BadRequestException exception1 = Assertions.assertThrows(
+                BadRequestException.class,
                 () -> userController.create(user));
         assertEquals("Логин не может быть пустым и содержать пробелы", exception1.getMessage());
         assertEquals(0, userController.findAll().size(), "Пользователь не должен быть создан");
@@ -61,8 +61,8 @@ class UserValidatorTest {
     @DisplayName("Проверка создания пользователя, если дата рождения в будущем")
     void shouldThrowExceptionWhenCreateUserWithWrongBirthday() {
         user.setBirthday(LocalDate.of(2024, 1, 23));
-        ValidationException exception = Assertions.assertThrows(
-                ValidationException.class,
+        BadRequestException exception = Assertions.assertThrows(
+                BadRequestException.class,
                 () -> userController.create(user));
         assertEquals("Дата рождения не может быть в будущем", exception.getMessage());
         assertEquals(0, userController.findAll().size(), "Пользователь не должен быть создан");

@@ -3,7 +3,8 @@ package ru.yandex.practicum.filmorate.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.exception.BadRequestException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
@@ -26,12 +27,15 @@ public class UserController {
         return new ArrayList<>(this.users.values());
     }
 
-    @ResponseBody
     @PostMapping()
-    public User create(@RequestBody User user) {
+    public User create(@RequestBody User user) throws BadRequestException {
         ++id;
-        if (!userValidator.getIsValid(user)) {
+        if (userValidator.throwIfNotValid(user)) {
             log.error("Ошибка: проверьте заполнение полей запроса.");
+            throw new BadRequestException("Ошибка при составлении запроса");
+        }
+        if (user.getName() == null || user.getName().isBlank() || user.getName().isEmpty()) {
+            user.setName(user.getLogin());
         }
         user.setId(id);
         users.put(id, user);
@@ -39,14 +43,17 @@ public class UserController {
         return user;
     }
 
-    @ResponseBody
     @PutMapping()
-    public User update(@RequestBody User user) {
+    public User update(@RequestBody User user) throws NotFoundException, BadRequestException {
         if (!users.containsKey(user.getId())) {
-            throw new ValidationException("Фильма с таким идентификатором нет в базе");
+            throw new NotFoundException("Пользователя с таким идентификатором нет в базе");
         }
-        if (!userValidator.getIsValid(user)) {
+        if (userValidator.throwIfNotValid(user)) {
             log.error("Ошибка: проверьте заполнение полей запроса.");
+            throw new BadRequestException("Ошибка при составлении запроса");
+        }
+        if (user.getName() == null || user.getName().isBlank() || user.getName().isEmpty()) {
+            user.setName(user.getLogin());
         }
         id = user.getId();
         users.put(id, user);

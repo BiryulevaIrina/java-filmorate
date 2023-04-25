@@ -5,7 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.controller.FilmController;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
@@ -29,15 +29,15 @@ class FilmValidatorTest {
     @DisplayName("Проверка создания фильма, если название пустое")
     void shouldThrowExceptionWhenCreateFilmWithEmptyName() {
         film.setName(" ");
-        ValidationException exception = Assertions.assertThrows(
-                ValidationException.class,
+        BadRequestException exception = Assertions.assertThrows(
+                BadRequestException.class,
                 () -> filmController.create(film));
         assertEquals("Название фильма не может быть пустым", exception.getMessage());
         assertEquals(0, filmController.findAll().size(), "Фильм не должен быть создан");
 
         film.setName(null);
-        ValidationException exception1 = Assertions.assertThrows(
-                ValidationException.class,
+        BadRequestException exception1 = Assertions.assertThrows(
+                BadRequestException.class,
                 () -> filmController.create(film));
         assertEquals("Название фильма не может быть пустым", exception1.getMessage());
         assertEquals(0, filmController.findAll().size(), "Фильм не должен быть создан");
@@ -51,8 +51,8 @@ class FilmValidatorTest {
                 "different types of art: music, theater, literature, painting and else. Every decade has brought " +
                 "something new for the cinema. For example, in the 30-s the main genres were musicals, " +
                 "gangster stories, mute comedies and horror films.");
-        ValidationException exception = Assertions.assertThrows(
-                ValidationException.class,
+        BadRequestException exception = Assertions.assertThrows(
+                BadRequestException.class,
                 () -> filmController.create(film));
         assertEquals("Максимальная длина описания фильма — 200 символов", exception.getMessage());
         assertEquals(0, filmController.findAll().size(), "Фильм не должен быть создан");
@@ -62,8 +62,8 @@ class FilmValidatorTest {
     @DisplayName("Проверка создания фильма, если дата релиза раньше 28 декабря 1895 года")
     void shouldThrowExceptionWhenCreateFilmWithWrongReleaseDate() {
         film.setReleaseDate(LocalDate.of(1895, 12, 01));
-        ValidationException exception = Assertions.assertThrows(
-                ValidationException.class,
+        BadRequestException exception = Assertions.assertThrows(
+                BadRequestException.class,
                 () -> filmController.create(film));
         assertEquals("Дата релиза — не раньше 28 декабря 1895 года", exception.getMessage());
         assertEquals(0, filmController.findAll().size(), "Фильм не должен быть создан");
@@ -73,8 +73,8 @@ class FilmValidatorTest {
     @DisplayName("Проверка создания фильма, если продолжительность фильма отрицательная")
     void shouldThrowExceptionWhenCreateFilmWithNegativeDuration() {
         film.setDuration(-100);
-        ValidationException exception = Assertions.assertThrows(
-                ValidationException.class,
+        BadRequestException exception = Assertions.assertThrows(
+                BadRequestException.class,
                 () -> filmController.create(film));
         assertEquals("Продолжительность фильма должна быть положительной", exception.getMessage());
         assertEquals(0, filmController.findAll().size(), "Фильм не должен быть создан");

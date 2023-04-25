@@ -3,7 +3,8 @@ package ru.yandex.practicum.filmorate.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.exception.BadRequestException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
 
@@ -28,12 +29,12 @@ public class FilmController {
         return new ArrayList<>(this.films.values());
     }
 
-    @ResponseBody
     @PostMapping()
-    public Film create(@RequestBody Film film) {
+    public Film create(@RequestBody Film film) throws BadRequestException {
         ++id;
-        if (!filmValidator.getIsValid(film)) {
+        if (filmValidator.throwIfNotValid(film)) {
             log.error("Ошибка: проверьте заполнение полей запроса.");
+            throw new BadRequestException("Ошибка при составлении запроса");
         }
         film.setId(id);
         films.put(id, film);
@@ -41,14 +42,14 @@ public class FilmController {
         return film;
     }
 
-    @ResponseBody
     @PutMapping()
-    public Film update(@RequestBody Film film) {
+    public Film update(@RequestBody Film film) throws NotFoundException, BadRequestException {
         if (!films.containsKey(film.getId())) {
-            throw new ValidationException("Фильма с таким идентификатором нет в базе");
+            throw new NotFoundException("Фильма с таким идентификатором нет в базе");
         }
-        if (!filmValidator.getIsValid(film)) {
+        if (filmValidator.throwIfNotValid(film)) {
             log.debug("Ошибка: проверьте заполнение полей запроса.");
+            throw new BadRequestException("Ошибка при составлении запроса");
         }
         id = film.getId();
         films.put(id, film);
