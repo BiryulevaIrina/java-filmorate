@@ -30,13 +30,8 @@ public class UserController {
     @PostMapping()
     public User create(@RequestBody User user) throws BadRequestException {
         ++id;
-        if (userValidator.throwIfNotValid(user)) {
-            log.error("Ошибка: проверьте заполнение полей запроса.");
-            throw new BadRequestException("Ошибка при составлении запроса");
-        }
-        if (user.getName() == null || user.getName().isBlank() || user.getName().isEmpty()) {
-            user.setName(user.getLogin());
-        }
+        userValidator.throwIfNotValid(user);
+        checkUserName(user);
         user.setId(id);
         users.put(id, user);
         log.debug("Зарегистрирован новый пользователь" + user.getName() + user.getEmail());
@@ -48,17 +43,18 @@ public class UserController {
         if (!users.containsKey(user.getId())) {
             throw new NotFoundException("Пользователя с таким идентификатором нет в базе");
         }
-        if (userValidator.throwIfNotValid(user)) {
-            log.error("Ошибка: проверьте заполнение полей запроса.");
-            throw new BadRequestException("Ошибка при составлении запроса");
-        }
-        if (user.getName() == null || user.getName().isBlank() || user.getName().isEmpty()) {
-            user.setName(user.getLogin());
-        }
+        userValidator.throwIfNotValid(user);
+        checkUserName(user);
         id = user.getId();
         users.put(id, user);
         log.debug("Обновлены данные о пользователе" + user.getName() + user.getEmail());
         return user;
+    }
+
+    private void checkUserName(@RequestBody User user) {
+        if (user.getName() == null || user.getName().isBlank() || user.getName().isEmpty()) {
+            user.setName(user.getLogin());
+        }
     }
 }
 

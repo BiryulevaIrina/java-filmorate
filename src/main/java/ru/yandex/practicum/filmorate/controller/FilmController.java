@@ -32,10 +32,7 @@ public class FilmController {
     @PostMapping()
     public Film create(@RequestBody Film film) throws BadRequestException {
         ++id;
-        if (filmValidator.throwIfNotValid(film)) {
-            log.error("Ошибка: проверьте заполнение полей запроса.");
-            throw new BadRequestException("Ошибка при составлении запроса");
-        }
+        filmValidator.throwIfNotValid(film);
         film.setId(id);
         films.put(id, film);
         log.info("Добавлен новый фильм" + film.getName());
@@ -47,10 +44,7 @@ public class FilmController {
         if (!films.containsKey(film.getId())) {
             throw new NotFoundException("Фильма с таким идентификатором нет в базе");
         }
-        if (filmValidator.throwIfNotValid(film)) {
-            log.debug("Ошибка: проверьте заполнение полей запроса.");
-            throw new BadRequestException("Ошибка при составлении запроса");
-        }
+        filmValidator.throwIfNotValid(film);
         id = film.getId();
         films.put(id, film);
         log.debug("Обновлены данные о фильме" + film.getName());
