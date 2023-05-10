@@ -1,60 +1,75 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.BadRequestException;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.validator.UserValidator;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.*;
 
 @RestController
 @RequestMapping("/users")
+@Slf4j
 public class UserController {
 
-    private static final Logger log = LoggerFactory.getLogger(UserController.class);
-    private final Map<Integer, User> users = new HashMap<>();
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
-    private final UserValidator userValidator = new UserValidator();
-
-    private int id;
+    private final UserService userService;
 
     @GetMapping()
-    public List<User> findAll() {
-        log.debug("Текущее количество пользователей: {}", users.size());
-        return new ArrayList<>(this.users.values());
+    public Collection<User> findAll() {
+        log.info("Получен GET-запрос на текущее количество пользователей");
+        return userService.findAll();
     }
 
     @PostMapping()
-    public User create(@RequestBody User user) throws BadRequestException {
-        ++id;
-        userValidator.throwIfNotValid(user);
-        checkUserName(user);
-        user.setId(id);
-        users.put(id, user);
-        log.debug("Зарегистрирован новый пользователь" + user.getName() + user.getEmail());
-        return user;
+    public User create(@RequestBody User user) {
+        log.info("Получен POST-запрос на добавление пользователя");
+        return userService.create(user);
     }
 
     @PutMapping()
-    public User update(@RequestBody User user) throws NotFoundException, BadRequestException {
-        if (!users.containsKey(user.getId())) {
-            throw new NotFoundException("Пользователя с таким идентификатором нет в базе");
-        }
-        userValidator.throwIfNotValid(user);
-        checkUserName(user);
-        id = user.getId();
-        users.put(id, user);
-        log.debug("Обновлены данные о пользователе" + user.getName() + user.getEmail());
-        return user;
+    public User update(@RequestBody User user) {
+        log.info("Получен PUT-запрос на обновление пользователя");
+        return userService.update(user);
     }
 
-    private void checkUserName(@RequestBody User user) {
-        if (user.getName() == null || user.getName().isBlank() || user.getName().isEmpty()) {
-            user.setName(user.getLogin());
-        }
+    @GetMapping("/{id}")
+    public User findUserById(@PathVariable int id) {
+        log.info("Получен GET-запрос на пользователя с ID={}", id);
+        return userService.findUserById(id);
+    }
+
+    @DeleteMapping("/{id}")
+    public User delete(int id) {
+        log.info("Получен DELETE-запрос на удаление пользователя с ID={}", id);
+        return userService.delete(id);
+    }
+
+    @PutMapping("/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable int id, @PathVariable int friendId) {
+        log.info("Получен PUT-запрос на добавление друга к пользователю c ID = {}", id);
+        userService.addFriend(id, friendId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void deleteFriend(@PathVariable int id, @PathVariable int friendId) {
+        log.info("Получен DELETE-запрос на удаление друга пользователю c ID = {}", id);
+        userService.deleteFriend(id, friendId);
+    }
+
+    @GetMapping("/{id}/friends")
+    public Collection<User> getFriends(@PathVariable int id) {
+        log.info("Получен GET-запрос на текущее количество друзей пользователя с ID = {}", id);
+        return userService.getFriends(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public Collection<User> getCommonFriends(@PathVariable int id, @PathVariable int otherId) {
+        log.info("Получен GET-запрос на текущее общее количество друзей пользователя с другим пользователем с ID = {}", otherId);
+        return userService.getCommonFriends(id, otherId);
     }
 }
 

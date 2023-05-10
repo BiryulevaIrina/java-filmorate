@@ -7,6 +7,9 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 
 import java.time.LocalDate;
 
@@ -15,7 +18,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class FilmValidatorTest {
 
     private final Film film = new Film();
-    private final FilmController filmController = new FilmController();
+
+    private final FilmStorage filmStorage = new InMemoryFilmStorage();
+
+    private final FilmController filmController = new FilmController(new FilmService(filmStorage));
 
     @BeforeEach
     void setUp() {
