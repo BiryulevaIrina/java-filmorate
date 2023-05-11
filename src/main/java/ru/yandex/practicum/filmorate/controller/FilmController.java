@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.validator.FilmValidator;
 
 import java.util.Collection;
 
@@ -14,6 +15,7 @@ import java.util.Collection;
 public class FilmController {
 
     private final FilmService filmService;
+    private final FilmValidator filmValidator = new FilmValidator();
 
     @Autowired
     public FilmController(FilmService filmService) {
@@ -22,26 +24,28 @@ public class FilmController {
 
     @GetMapping()
     public Collection<Film> findAll() {
-        log.info("Получен GET-запрос на текущее количество фильмов");
+        log.info("Получен GET-запрос на текущий список фильмов");
         return filmService.findAll();
     }
 
     @PostMapping()
     public Film create(@RequestBody Film film) {
         log.info("Получен POST-запрос на добавление фильма");
+        filmValidator.throwIfNotValid(film);
         return filmService.create(film);
     }
 
     @PutMapping()
     public Film update(@RequestBody Film film) {
         log.info("Получен PUT-запрос на обновление фильма");
+        filmValidator.throwIfNotValid(film);
         return filmService.update(film);
     }
 
     @GetMapping("/{id}")
     public Film findFilmById(@PathVariable int id) {
         log.info("Получен GET-запрос на фильм с ID={}", id);
-        return filmService.findFilmById(id);
+        return filmService.findById(id);
     }
 
     @DeleteMapping("/{id}")

@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.validator.FilmValidator;
 
 import java.util.*;
 
@@ -13,9 +12,6 @@ import java.util.*;
 public class InMemoryFilmStorage implements FilmStorage {
 
     private final Map<Integer, Film> films = new HashMap<>();
-
-    private final FilmValidator filmValidator = new FilmValidator();
-
     private int id;
 
     @Override
@@ -27,7 +23,6 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film create(Film film) {
         ++id;
-        filmValidator.throwIfNotValid(film);
         film.setId(id);
         films.put(id, film);
         log.info("Добавлен новый фильм" + film.getName());
@@ -36,10 +31,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film update(Film film) throws NotFoundException {
-        if (!films.containsKey(film.getId())) {
-            throw new NotFoundException("Фильма с таким идентификатором нет в базе");
-        }
-        filmValidator.throwIfNotValid(film);
         id = film.getId();
         films.put(id, film);
         log.debug("Обновлены данные о фильме" + film.getName());
@@ -47,19 +38,13 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film findFilmById(int filmId) {
-        if (!films.containsKey(filmId)) {
-            throw new NotFoundException("Не найден фильм с ID = " + filmId);
-        }
-        return films.get(filmId);
+    public Optional<Film> findById(int id) {
+        return Optional.ofNullable(films.get(id));
     }
 
     @Override
-    public Film delete(int filmId) {
-        if (!films.containsKey(filmId)) {
-            throw new NotFoundException("Не найден фильм с ID = " + filmId);
-        }
-        return films.remove(filmId);
+    public Optional<Film> delete(int id) {
+        return Optional.ofNullable(films.remove(id));
     }
 
 }

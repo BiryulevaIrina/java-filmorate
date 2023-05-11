@@ -75,13 +75,14 @@ class UserValidatorTest {
     @Test
     @DisplayName("Проверка создания пользователя, если имя пустое")
     void shouldCreateUserWithEmptyName() {
-        user.setName("");
-        userController.create(user);
-        assertEquals("Login1", user.getName(), "При пустом имени должен использоваться логин");
-
         user.setName(null);
         userController.create(user);
         assertEquals("Login1", user.getName(), "При пустом имени должен использоваться логин");
+
+        user.setLogin("Login2");
+        user.setName("");
+        userController.create(user);
+        assertEquals("Login2", user.getName(), "При пустом имени должен использоваться логин");
     }
 
     @Test
