@@ -19,7 +19,7 @@ public class UserService {
         this.userStorage = userStorage;
     }
 
-    public Collection<User> findAll() {
+    public List<User> findAll() {
         return userStorage.findAll();
     }
 
@@ -71,8 +71,8 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public Collection<User> getCommonFriends(int id, int otherId) {
-        Set<User> commonFriends = new HashSet<>(getFriends(id));
+    public List<User> getCommonFriends(int id, int otherId) {
+        List<User> commonFriends = new ArrayList<>(getFriends(id));
         commonFriends.retainAll(getFriends(otherId));
         return commonFriends;
     }

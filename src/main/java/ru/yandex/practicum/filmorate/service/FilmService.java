@@ -20,7 +20,7 @@ public class FilmService {
         this.filmStorage = filmStorage;
     }
 
-    public Collection<Film> findAll() {
+    public List<Film> findAll() {
         return filmStorage.findAll();
     }
 

@@ -15,9 +15,9 @@ public class InMemoryFilmStorage implements FilmStorage {
     private int id;
 
     @Override
-    public Collection<Film> findAll() {
+    public List<Film> findAll() {
         log.debug("Текущее количество фильмов: {}", films.size());
-        return films.values();
+        return new ArrayList<>(this.films.values());
     }
 
     @Override

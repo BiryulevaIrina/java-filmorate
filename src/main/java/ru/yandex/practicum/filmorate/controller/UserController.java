@@ -21,7 +21,7 @@ public class UserController {
     private final UserValidator userValidator = new UserValidator();
 
     @GetMapping()
-    public Collection<User> findAll() {
+    public List<User> findAll() {
         log.info("Получен GET-запрос на текущий список пользователей");
         return userService.findAll();
     }
@@ -71,7 +71,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public Collection<User> getCommonFriends(@PathVariable int id, @PathVariable int otherId) {
+    public List<User> getCommonFriends(@PathVariable int id, @PathVariable int otherId) {
         log.info("Получен GET-запрос на текущее общее количество друзей пользователя с ID = {} " +
                 "с другим пользователем с ID = {}", id, otherId);
         return userService.getCommonFriends(id, otherId);

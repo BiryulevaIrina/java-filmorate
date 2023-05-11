@@ -6,10 +6,7 @@ import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 @Slf4j
@@ -20,9 +17,9 @@ public class InMemoryUserStorage implements UserStorage {
     private int id;
 
     @Override
-    public Collection<User> findAll() {
+    public List<User> findAll() {
         log.debug("Текущее количество пользователей: {}", users.size());
-        return users.values();
+        return new ArrayList<>(this.users.values());
     }
 
     @Override
