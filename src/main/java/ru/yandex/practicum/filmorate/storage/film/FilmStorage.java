@@ -15,6 +15,6 @@ public interface FilmStorage {
 
     Optional<Film> findById(int id);
 
-    Optional<Film> delete(int filmId);
+    Film delete(int filmId);
 
 }

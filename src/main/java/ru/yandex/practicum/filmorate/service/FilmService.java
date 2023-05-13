@@ -44,8 +44,10 @@ public class FilmService {
     }
 
     public Film delete(int filmId) {
-        return filmStorage.delete(filmId)
-                .orElseThrow(() -> new NotFoundException("Фильма с идентификатором " + filmId + " нет в базе."));
+        if (findById(filmId) == null) {
+            throw new NotFoundException("Фильма с идентификатором " + filmId + " нет в базе.");
+        }
+        return filmStorage.delete(filmId);
     }
 
     public void addLike(int filmId, int userId) {

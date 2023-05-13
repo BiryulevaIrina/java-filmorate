@@ -43,8 +43,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Optional<Film> delete(int id) {
-        return Optional.ofNullable(films.remove(id));
+    public Film delete(int id) {
+        return films.remove(id);
     }
 
 }

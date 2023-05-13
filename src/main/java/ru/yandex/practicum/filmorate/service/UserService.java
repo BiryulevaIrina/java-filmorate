@@ -24,12 +24,12 @@ public class UserService {
     }
 
     public User create(User user) {
-        checkUserName(user);
+        userNameVerification(user);
         return userStorage.create(user);
     }
 
     public User update(User user) {
-        checkUserName(user);
+        userNameVerification(user);
         if (findById(user.getId()) == null) {
             throw new NotFoundException("Пользователя с идентификатором " + user.getId() + " нет в базе.");
         }
@@ -42,8 +42,11 @@ public class UserService {
     }
 
     public User delete(int userId) {
-        return userStorage.delete(userId)
-                .orElseThrow(() -> new NotFoundException("Пользователя с идентификатором " + userId + " нет в базе."));
+        if (findById(userId) == null) {
+            throw new NotFoundException("Пользователя с идентификатором " + userId + " нет в базе.");
+        }
+        return userStorage.delete(userId);
+
     }
 
     public void addFriend(int userId, int friendsId) {
@@ -77,7 +80,7 @@ public class UserService {
         return commonFriends;
     }
 
-    public void checkUserName(User user) {
+    public void userNameVerification(User user) {
         if (user.getName() == null || user.getName().isBlank() || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
