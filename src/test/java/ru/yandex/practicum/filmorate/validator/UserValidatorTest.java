@@ -4,6 +4,9 @@ import org.junit.jupiter.api.*;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 
@@ -11,7 +14,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UserValidatorTest {
     private final User user = new User();
-    private final UserController userController = new UserController();
+    private final UserStorage userStorage = new InMemoryUserStorage();
+    private final UserController userController = new UserController(new UserService(userStorage));
 
     @BeforeEach
     void setUp() {
@@ -71,13 +75,14 @@ class UserValidatorTest {
     @Test
     @DisplayName("Проверка создания пользователя, если имя пустое")
     void shouldCreateUserWithEmptyName() {
-        user.setName("");
-        userController.create(user);
-        assertEquals("Login1", user.getName(), "При пустом имени должен использоваться логин");
-
         user.setName(null);
         userController.create(user);
         assertEquals("Login1", user.getName(), "При пустом имени должен использоваться логин");
+
+        user.setLogin("Login2");
+        user.setName("");
+        userController.create(user);
+        assertEquals("Login2", user.getName(), "При пустом имени должен использоваться логин");
     }
 
     @Test
