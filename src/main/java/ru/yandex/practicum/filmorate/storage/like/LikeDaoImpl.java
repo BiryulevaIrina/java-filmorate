@@ -4,7 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
+<<<<<<< HEAD
 import ru.yandex.practicum.filmorate.model.Like;
+=======
+>>>>>>> 5633de2 (fix: правка согласно код-стайлу)
 import ru.yandex.practicum.filmorate.storage.film.FilmMapper;
 
 import java.util.List;
