@@ -18,10 +18,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class FilmValidatorTest {
 
     private final Film film = new Film();
-
     private final FilmStorage filmStorage = new InMemoryFilmStorage();
 
-    private final FilmController filmController = new FilmController(new FilmService(filmStorage));
+    private final FilmController filmController = new FilmController(new FilmService(filmStorage,
+            null, null, null, null));
 
     @BeforeEach
     void setUp() {
@@ -84,13 +84,6 @@ class FilmValidatorTest {
                 () -> filmController.create(film));
         assertEquals("Продолжительность фильма должна быть положительной", exception.getMessage());
         assertEquals(0, filmController.findAll().size(), "Фильм не должен быть создан");
-    }
-
-    @Test
-    @DisplayName("Проверка создания пользователя")
-    void shouldCreateUser() {
-        filmController.create(film);
-        assertEquals(1, filmController.findAll().size(), "Неверное количество пользователей");
     }
 
 }

@@ -5,7 +5,7 @@ Template repository for Filmorate project.
 
 ---
 
-![Filmorate diagram ](https://github.com/BiryulevaIrina/java-filmorate/assets/120193162/6ef6c8af-94dd-4c99-939d-af41ea26c5ad)
+![Filmorate diagram](https://github.com/BiryulevaIrina/java-filmorate/assets/120193162/af88f00d-e6be-4660-aa5e-6b416b5fdcc0)
 
 
 ### Примеры запросов 

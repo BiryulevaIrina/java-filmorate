@@ -3,7 +3,9 @@ package ru.yandex.practicum.filmorate.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Friend;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.friends.FriendDao;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.*;
@@ -13,10 +15,12 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserStorage userStorage;
+    private final FriendDao friendsDao;
 
     @Autowired
-    public UserService(UserStorage userStorage) {
+    public UserService(UserStorage userStorage, FriendDao friendsDao) {
         this.userStorage = userStorage;
+        this.friendsDao = friendsDao;
     }
 
     public List<User> findAll() {
@@ -30,10 +34,11 @@ public class UserService {
 
     public User update(User user) {
         userNameVerification(user);
-        if (findById(user.getId()) == null) {
+        if (findById(user.getId()) != null) {
+            return userStorage.update(user);
+        } else {
             throw new NotFoundException("Пользователя с идентификатором " + user.getId() + " нет в базе.");
         }
-        return userStorage.update(user);
     }
 
     public User findById(int userId) {
@@ -42,32 +47,33 @@ public class UserService {
     }
 
     public User delete(int userId) {
+        User user = findById(userId);
         if (findById(userId) == null) {
             throw new NotFoundException("Пользователя с идентификатором " + userId + " нет в базе.");
         }
-        return userStorage.delete(userId);
-
+        userStorage.delete(userId);
+        return user;
     }
 
-    public void addFriend(int userId, int friendsId) {
-        User user = findById(userId);
-        User friend = findById(friendsId);
-        user.addFriend(friendsId);
-        friend.addFriend(userId);
+    public void addFriend(int userId, int friendId) {
+        if (findById(friendId) == null) {
+            throw new NotFoundException("Пользователя с идентификатором " + userId + " нет в базе.");
+        }
+        friendsDao.addFriend(userId, friendId, true);
     }
 
-    public void deleteFriend(int userId, int friendsId) {
-        User user = findById(userId);
-        User friend = findById(friendsId);
-        user.getFriends().remove(friendsId);
-        friend.getFriends().remove(userId);
+    public void deleteFriend(int userId, int friendId) {
+        if (findById(friendId) == null) {
+            throw new NotFoundException("Пользователя с идентификатором " + userId + " нет в базе.");
+        }
+        friendsDao.deleteFriend(userId, friendId);
     }
 
     public List<User> getFriends(int userId) {
-        User user = findById(userId);
         Set<User> friends = new HashSet<>();
-        for (Integer id : user.getFriends()) {
-            friends.add(findById(id));
+        for (Friend friend : friendsDao.getFriends(userId)) {
+            User user = findById(friend.getIdFriend());
+            friends.add(user);
         }
         return friends.stream()
                 .sorted(Comparator.comparingInt(User::getId))
