@@ -7,11 +7,15 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,8 +31,12 @@ class FilmValidatorTest {
     void setUp() {
         film.setName("Film1");
         film.setDescription("Description Film1");
-        film.setReleaseDate(LocalDate.of(2022, 3, 12));
+        film.setReleaseDate(LocalDate.of(2021, 1, 15));
         film.setDuration(100);
+        film.setMpa(new Mpa(1, "G"));
+        film.setLikes(new HashSet<>());
+        film.setGenres(new HashSet<>(Arrays.asList(new Genre(4, "Триллер"),
+                new Genre(6, "Боевик"))));
     }
 
     @Test
@@ -39,14 +47,14 @@ class FilmValidatorTest {
                 BadRequestException.class,
                 () -> filmController.create(film));
         assertEquals("Название фильма не может быть пустым", exception.getMessage());
-        assertEquals(0, filmController.getFilms().size(), "Фильм не должен быть создан");
+        assertEquals(0, filmStorage.findAll().size(), "Фильм не должен быть создан");
 
         film.setName(null);
         BadRequestException exception1 = Assertions.assertThrows(
                 BadRequestException.class,
                 () -> filmController.create(film));
         assertEquals("Название фильма не может быть пустым", exception1.getMessage());
-        assertEquals(0, filmController.getFilms().size(), "Фильм не должен быть создан");
+        assertEquals(0, filmStorage.findAll().size(), "Фильм не должен быть создан");
     }
 
     @Test
@@ -61,7 +69,7 @@ class FilmValidatorTest {
                 BadRequestException.class,
                 () -> filmController.create(film));
         assertEquals("Максимальная длина описания фильма — 200 символов", exception.getMessage());
-        assertEquals(0, filmController.getFilms().size(), "Фильм не должен быть создан");
+        assertEquals(0, filmStorage.findAll().size(), "Фильм не должен быть создан");
     }
 
     @Test
@@ -72,7 +80,7 @@ class FilmValidatorTest {
                 BadRequestException.class,
                 () -> filmController.create(film));
         assertEquals("Дата релиза — не раньше 28 декабря 1895 года", exception.getMessage());
-        assertEquals(0, filmController.getFilms().size(), "Фильм не должен быть создан");
+        assertEquals(0, filmStorage.findAll().size(), "Фильм не должен быть создан");
     }
 
     @Test
@@ -83,7 +91,7 @@ class FilmValidatorTest {
                 BadRequestException.class,
                 () -> filmController.create(film));
         assertEquals("Продолжительность фильма должна быть положительной", exception.getMessage());
-        assertEquals(0, filmController.getFilms().size(), "Фильм не должен быть создан");
+        assertEquals(0, filmStorage.findAll().size(), "Фильм не должен быть создан");
     }
 
 }
