@@ -17,11 +17,11 @@ public class MpaRatingService {
         this.mpaRatingDao = mpaRatingDao;
     }
 
-    public List<Mpa> findAll() {
+    public List<Mpa> getMpaRatings() {
         return mpaRatingDao.findAll();
     }
 
-    public Mpa findById(int id) {
+    public Mpa getMpaRatingById(int id) {
         return mpaRatingDao.findById(id)
                 .orElseThrow(() -> new NotFoundException("MPA рейтинга с идентификатором " + id + " нет в базе."));
     }

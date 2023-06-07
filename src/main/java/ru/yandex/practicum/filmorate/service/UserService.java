@@ -23,7 +23,7 @@ public class UserService {
         this.friendsDao = friendsDao;
     }
 
-    public List<User> findAll() {
+    public List<User> getUsers() {
         return userStorage.findAll();
     }
 
@@ -34,45 +34,42 @@ public class UserService {
 
     public User update(User user) {
         userNameVerification(user);
-        if (findById(user.getId()) != null) {
-            return userStorage.update(user);
-        } else {
-            throw new NotFoundException("Пользователя с идентификатором " + user.getId() + " нет в базе.");
-        }
+        userStorage.findById(user.getId())
+                .orElseThrow(() -> new NotFoundException("Пользователя с идентификатором " + user.getId()
+                        + " нет в базе."));
+        return userStorage.update(user);
     }
 
-    public User findById(int userId) {
+    public User getUserById(int userId) {
         return userStorage.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователя с идентификатором " + userId + " нет в базе."));
     }
 
     public User delete(int userId) {
-        User user = findById(userId);
-        if (findById(userId) == null) {
-            throw new NotFoundException("Пользователя с идентификатором " + userId + " нет в базе.");
-        }
+        User user = userStorage.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователя с идентификатором " + userId + " нет в базе."));
         userStorage.delete(userId);
         return user;
     }
 
     public void addFriend(int userId, int friendId) {
-        if (findById(friendId) == null) {
-            throw new NotFoundException("Пользователя с идентификатором " + userId + " нет в базе.");
-        }
+        userStorage.findById(friendId)
+                .orElseThrow(() -> new NotFoundException("Пользователя с идентификатором " + friendId
+                        + " нет в базе."));
         friendsDao.addFriend(userId, friendId, true);
     }
 
     public void deleteFriend(int userId, int friendId) {
-        if (findById(friendId) == null) {
-            throw new NotFoundException("Пользователя с идентификатором " + userId + " нет в базе.");
-        }
+        userStorage.findById(friendId)
+                .orElseThrow(() -> new NotFoundException("Пользователя с идентификатором " + friendId
+                        + " нет в базе."));
         friendsDao.deleteFriend(userId, friendId);
     }
 
     public List<User> getFriends(int userId) {
         Set<User> friends = new HashSet<>();
         for (Friend friend : friendsDao.getFriends(userId)) {
-            User user = findById(friend.getIdFriend());
+            User user = getUserById(friend.getIdFriend());
             friends.add(user);
         }
         return friends.stream()

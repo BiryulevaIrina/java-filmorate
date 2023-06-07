@@ -4,11 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Genre;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Component
 public class GenreDaoImpl implements GenreDao {
@@ -46,9 +42,10 @@ public class GenreDaoImpl implements GenreDao {
 
     @Override
     public Set<Genre> getGenres(int filmId) {
-        return new HashSet<>(jdbcTemplate.query("SELECT fg.id_genre, g.name FROM films_genres AS fg "
+        List<Genre> genreList = jdbcTemplate.query("SELECT fg.id_genre, g.name FROM films_genres AS fg "
                 + "LEFT OUTER JOIN genres AS g ON fg.id_genre = g.id_genre "
-                + "WHERE fg.id_film=? ORDER BY g.id_genre", new GenreMapper(), filmId));
+                + "WHERE fg.id_film=? ORDER BY g.id_genre ASC", new GenreMapper(), filmId);
+        return new HashSet<>(genreList);
     }
 
     @Override
@@ -62,4 +59,12 @@ public class GenreDaoImpl implements GenreDao {
         addGenres(filmId, genres);
     }
 
+    @Override
+    public Set<Genre> findAllByFilms(List<Integer> filmsId) {
+        String inQuery = String.join(",", Collections.nCopies(filmsId.size(), "?"));
+        return new HashSet<>(jdbcTemplate.query("SELECT fg.id_film, g.id_genre, g.name FROM genres AS g, "
+                        + "films_genres AS fg WHERE fg.id_genre = g.id_genre AND fg.id_film IN (" + inQuery + ") " +
+                        "GROUP BY g.id_genre ORDER BY g.id_genre ASC",
+                new GenreMapper(), filmsId.toArray()));
+    }
 }

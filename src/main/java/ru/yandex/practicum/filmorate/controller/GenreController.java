@@ -23,14 +23,14 @@ public class GenreController {
     }
 
     @GetMapping()
-    public List<Genre> findAll() {
+    public List<Genre> getGenres() {
         log.info("Получен GET-запрос на текущий список жанров");
-        return genreService.findAll();
+        return genreService.getGenres();
     }
 
     @GetMapping("/{id}")
-    public Genre findById(@PathVariable int id) {
+    public Genre getGenreById(@PathVariable int id) {
         log.info("Получен GET-запрос на жанр с ID={}", id);
-        return genreService.findById(id);
+        return genreService.getGenreById(id);
     }
 }

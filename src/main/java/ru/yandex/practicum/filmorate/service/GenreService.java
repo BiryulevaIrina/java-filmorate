@@ -17,11 +17,11 @@ public class GenreService {
         this.genreDao = genreDao;
     }
 
-    public List<Genre> findAll() {
+    public List<Genre> getGenres() {
         return genreDao.findAll();
     }
 
-    public Genre findById(int id) {
+    public Genre getGenreById(int id) {
         return genreDao.findById(id)
                 .orElseThrow(() -> new NotFoundException("Жанра с идентификатором " + id + " нет в базе."));
     }

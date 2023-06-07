@@ -23,9 +23,9 @@ public class FilmController {
     }
 
     @GetMapping()
-    public List<Film> findAll() {
+    public List<Film> getFilms() {
         log.info("Получен GET-запрос на текущий список фильмов");
-        return filmService.findAll();
+        return filmService.getFilms();
     }
 
     @PostMapping()
@@ -45,7 +45,7 @@ public class FilmController {
     @GetMapping("/{id}")
     public Film findFilmById(@PathVariable int id) {
         log.info("Получен GET-запрос на фильм с ID={}", id);
-        return filmService.findById(id);
+        return filmService.getFilmById(id);
     }
 
     @DeleteMapping("/{id}")

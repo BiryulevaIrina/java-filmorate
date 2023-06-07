@@ -20,4 +20,6 @@ public interface GenreDao {
 
     void updateGenres(int filmId, Set<Genre> genres);
 
+    Set<Genre> findAllByFilms(List<Integer> filmsId);
+
 }

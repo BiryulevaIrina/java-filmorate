@@ -39,14 +39,14 @@ class FilmValidatorTest {
                 BadRequestException.class,
                 () -> filmController.create(film));
         assertEquals("Название фильма не может быть пустым", exception.getMessage());
-        assertEquals(0, filmController.findAll().size(), "Фильм не должен быть создан");
+        assertEquals(0, filmController.getFilms().size(), "Фильм не должен быть создан");
 
         film.setName(null);
         BadRequestException exception1 = Assertions.assertThrows(
                 BadRequestException.class,
                 () -> filmController.create(film));
         assertEquals("Название фильма не может быть пустым", exception1.getMessage());
-        assertEquals(0, filmController.findAll().size(), "Фильм не должен быть создан");
+        assertEquals(0, filmController.getFilms().size(), "Фильм не должен быть создан");
     }
 
     @Test
@@ -61,18 +61,18 @@ class FilmValidatorTest {
                 BadRequestException.class,
                 () -> filmController.create(film));
         assertEquals("Максимальная длина описания фильма — 200 символов", exception.getMessage());
-        assertEquals(0, filmController.findAll().size(), "Фильм не должен быть создан");
+        assertEquals(0, filmController.getFilms().size(), "Фильм не должен быть создан");
     }
 
     @Test
     @DisplayName("Проверка создания фильма, если дата релиза раньше 28 декабря 1895 года")
     void shouldThrowExceptionWhenCreateFilmWithWrongReleaseDate() {
-        film.setReleaseDate(LocalDate.of(1895, 12, 01));
+        film.setReleaseDate(LocalDate.of(1895, 12, 1));
         BadRequestException exception = Assertions.assertThrows(
                 BadRequestException.class,
                 () -> filmController.create(film));
         assertEquals("Дата релиза — не раньше 28 декабря 1895 года", exception.getMessage());
-        assertEquals(0, filmController.findAll().size(), "Фильм не должен быть создан");
+        assertEquals(0, filmController.getFilms().size(), "Фильм не должен быть создан");
     }
 
     @Test
@@ -83,7 +83,7 @@ class FilmValidatorTest {
                 BadRequestException.class,
                 () -> filmController.create(film));
         assertEquals("Продолжительность фильма должна быть положительной", exception.getMessage());
-        assertEquals(0, filmController.findAll().size(), "Фильм не должен быть создан");
+        assertEquals(0, filmController.getFilms().size(), "Фильм не должен быть создан");
     }
 
 }

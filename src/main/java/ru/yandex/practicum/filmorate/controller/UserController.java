@@ -21,9 +21,9 @@ public class UserController {
     private final UserValidator userValidator = new UserValidator();
 
     @GetMapping()
-    public List<User> findAll() {
+    public List<User> getUsers() {
         log.info("Получен GET-запрос на текущий список пользователей");
-        return userService.findAll();
+        return userService.getUsers();
     }
 
     @PostMapping()
@@ -41,9 +41,9 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public User findById(@PathVariable int id) {
+    public User getUserById(@PathVariable int id) {
         log.info("Получен GET-запрос на пользователя с ID={}", id);
-        return userService.findById(id);
+        return userService.getUserById(id);
     }
 
     @DeleteMapping("/{id}")
