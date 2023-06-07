@@ -22,4 +22,8 @@ public class Film {
 
     private Set<Integer> likes = new HashSet<>();
 
+    public void addGenre(Genre genre) {
+        this.genres.add(genre);
+    }
+
 }

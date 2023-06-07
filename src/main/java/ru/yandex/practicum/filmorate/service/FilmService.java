@@ -12,7 +12,7 @@ import ru.yandex.practicum.filmorate.storage.mpaRating.MpaRatingDao;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
 
 @Service
 public class FilmService {
@@ -35,13 +35,8 @@ public class FilmService {
 
     public List<Film> getFilms() {
         List<Film> films = filmStorage.findAll();
-        List<Integer> idFilms = films.stream()
-                .map(Film::getId)
-                .collect(Collectors.toList());
-        for (Film film : films) {
-            film.setMpa(mpaRatingDao.getByFilmId(film.getId()));
-            film.setGenres(genreDao.findAllByFilms(idFilms));
-        }
+        genreDao.load(films);
+        mpaRatingDao.load(films);
         return films;
     }
 
@@ -99,10 +94,8 @@ public class FilmService {
     public List<Film> getPopularFilms(int count) {
         if (count >= 1) {
             List<Film> popularFilms = likeDao.getPopularFilms(count);
-            for (Film popularFilm : popularFilms) {
-                popularFilm.setGenres(genreDao.getGenres(popularFilm.getId()));
-                popularFilm.setMpa(mpaRatingDao.getByFilmId(popularFilm.getId()));
-            }
+            genreDao.load(popularFilms);
+            mpaRatingDao.load(popularFilms);
             return popularFilms;
         }
         throw new BadRequestException("Ошибка запроса, указано некорректное количество фильмов (меньше 1)" + count);

@@ -3,8 +3,15 @@ package ru.yandex.practicum.filmorate.storage.genre;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.function.UnaryOperator.identity;
 
 @Component
 public class GenreDaoImpl implements GenreDao {
@@ -39,7 +46,6 @@ public class GenreDaoImpl implements GenreDao {
         }
     }
 
-
     @Override
     public Set<Genre> getGenres(int filmId) {
         List<Genre> genreList = jdbcTemplate.query("SELECT fg.id_genre, g.name FROM films_genres AS fg "
@@ -60,11 +66,27 @@ public class GenreDaoImpl implements GenreDao {
     }
 
     @Override
-    public Set<Genre> findAllByFilms(List<Integer> filmsId) {
-        String inQuery = String.join(",", Collections.nCopies(filmsId.size(), "?"));
-        return new HashSet<>(jdbcTemplate.query("SELECT fg.id_film, g.id_genre, g.name FROM genres AS g, "
-                        + "films_genres AS fg WHERE fg.id_genre = g.id_genre AND fg.id_film IN (" + inQuery + ") " +
-                        "GROUP BY g.id_genre ORDER BY g.id_genre ASC",
-                new GenreMapper(), filmsId.toArray()));
+    public void load(List<Film> films) {
+        String inQuery = String.join(",", Collections.nCopies(films.size(), "?"));
+
+        String mainQuery = "SELECT * FROM genres AS g, films_genres AS fg "
+                + "WHERE fg.id_genre = g.id_genre AND fg.id_film IN (" + inQuery + ") ";
+
+        Map<Integer, Film> filmById = films.stream()
+                .collect(Collectors.toMap(Film::getId, identity()));
+
+        jdbcTemplate.query(mainQuery, (rs) -> {
+            Film film = filmById.get(rs.getInt("id_film"));
+            Genre genre = makeGenre(rs);
+            film.addGenre(genre);
+        }, films.stream()
+                .map(Film::getId).toArray());
     }
+
+    Genre makeGenre(ResultSet rs) throws SQLException {
+        return new Genre(
+                rs.getInt("id_genre"),
+                rs.getString("name"));
+    }
+
 }

@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.genre;
 
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.List;
@@ -20,6 +21,6 @@ public interface GenreDao {
 
     void updateGenres(int filmId, Set<Genre> genres);
 
-    Set<Genre> findAllByFilms(List<Integer> filmsId);
+    void load(List<Film> films);
 
 }

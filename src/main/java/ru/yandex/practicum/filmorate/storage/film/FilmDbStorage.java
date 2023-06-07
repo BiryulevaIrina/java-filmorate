@@ -6,8 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 @Primary
@@ -24,7 +23,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> findAll() {
-       return jdbcTemplate.query("SELECT * FROM films", new FilmMapper());
+        return jdbcTemplate.query("SELECT * FROM films", new FilmMapper());
     }
 
     @Override

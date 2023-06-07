@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.mpaRating;
 
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.util.List;
@@ -12,4 +13,6 @@ public interface MpaRatingDao {
     Optional<Mpa> findById(int id);
 
     Mpa getByFilmId(int filmId);
+
+    void load(List<Film> films);
 }
