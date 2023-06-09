@@ -18,8 +18,4 @@ public class User {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday;
 
-    public void addFriend(int id) {
-        friends.add(id);
-    }
-
 }

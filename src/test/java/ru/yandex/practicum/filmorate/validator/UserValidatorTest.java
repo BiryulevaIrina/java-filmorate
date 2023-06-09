@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserValidatorTest {
     private final User user = new User();
     private final UserStorage userStorage = new InMemoryUserStorage();
-    private final UserController userController = new UserController(new UserService(userStorage));
+    private final UserController userController = new UserController(new UserService(userStorage, null));
 
     @BeforeEach
     void setUp() {
@@ -33,14 +33,14 @@ class UserValidatorTest {
                 BadRequestException.class,
                 () -> userController.create(user));
         assertEquals("Электронная почта не может быть пустой и должна содержать символ @", exception.getMessage());
-        assertEquals(0, userController.findAll().size(), "Пользователь не должен быть создан");
+        assertEquals(0, userController.getUsers().size(), "Пользователь не должен быть создан");
 
         user.setEmail("email1.email.ru");
         BadRequestException exception1 = Assertions.assertThrows(
                 BadRequestException.class,
                 () -> userController.create(user));
         assertEquals("Электронная почта не может быть пустой и должна содержать символ @", exception1.getMessage());
-        assertEquals(0, userController.findAll().size(), "Пользователь не должен быть создан");
+        assertEquals(0, userController.getUsers().size(), "Пользователь не должен быть создан");
     }
 
     @Test
@@ -51,14 +51,14 @@ class UserValidatorTest {
                 BadRequestException.class,
                 () -> userController.create(user));
         assertEquals("Логин не может быть пустым и содержать пробелы", exception.getMessage());
-        assertEquals(0, userController.findAll().size(), "Пользователь не должен быть создан");
+        assertEquals(0, userController.getUsers().size(), "Пользователь не должен быть создан");
 
         user.setLogin("Log in 1");
         BadRequestException exception1 = Assertions.assertThrows(
                 BadRequestException.class,
                 () -> userController.create(user));
         assertEquals("Логин не может быть пустым и содержать пробелы", exception1.getMessage());
-        assertEquals(0, userController.findAll().size(), "Пользователь не должен быть создан");
+        assertEquals(0, userController.getUsers().size(), "Пользователь не должен быть создан");
     }
 
     @Test
@@ -69,7 +69,7 @@ class UserValidatorTest {
                 BadRequestException.class,
                 () -> userController.create(user));
         assertEquals("Дата рождения не может быть в будущем", exception.getMessage());
-        assertEquals(0, userController.findAll().size(), "Пользователь не должен быть создан");
+        assertEquals(0, userController.getUsers().size(), "Пользователь не должен быть создан");
     }
 
     @Test
@@ -89,7 +89,7 @@ class UserValidatorTest {
     @DisplayName("Проверка создания пользователя")
     void shouldCreateUser() {
         userController.create(user);
-        assertEquals(1, userController.findAll().size(), "Неверное количество пользователей");
+        assertEquals(1, userController.getUsers().size(), "Неверное количество пользователей");
     }
 
 }
