@@ -13,16 +13,18 @@ import java.util.Optional;
 public class UserDbStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
+    private final UserMapper userMapper;
 
     private int id;
 
-    public UserDbStorage(JdbcTemplate jdbcTemplate) {
+    public UserDbStorage(JdbcTemplate jdbcTemplate, UserMapper userMapper) {
         this.jdbcTemplate = jdbcTemplate;
+        this.userMapper = userMapper;
     }
 
     @Override
     public List<User> findAll() {
-        return jdbcTemplate.query("SELECT * FROM users", new UserMapper());
+        return jdbcTemplate.query("SELECT * FROM users", userMapper);
     }
 
     @Override
@@ -43,12 +45,8 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public Optional<User> findById(int id) {
-        User user = jdbcTemplate.query("SELECT id_user, email, login, name, birthday FROM users WHERE id_user=?",
-                new UserMapper(), id).stream().findAny().orElse(null);
-        if (user == null) {
-            return Optional.empty();
-        }
-        return Optional.of(user);
+        return jdbcTemplate.query("SELECT id_user, email, login, name, birthday FROM users WHERE id_user=?",
+                userMapper, id).stream().findAny();
     }
 
     @Override

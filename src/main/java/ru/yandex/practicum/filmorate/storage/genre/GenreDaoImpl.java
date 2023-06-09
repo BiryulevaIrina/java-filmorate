@@ -6,36 +6,33 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.function.UnaryOperator.identity;
 
+
 @Component
 public class GenreDaoImpl implements GenreDao {
     private final JdbcTemplate jdbcTemplate;
+    private final GenreMapper genreMapper;
 
     @Autowired
-    public GenreDaoImpl(JdbcTemplate jdbcTemplate) {
+    public GenreDaoImpl(JdbcTemplate jdbcTemplate, GenreMapper genreMapper) {
         this.jdbcTemplate = jdbcTemplate;
+        this.genreMapper = genreMapper;
     }
 
     @Override
     public List<Genre> findAll() {
-        return jdbcTemplate.query("SELECT id_genre, name FROM genres ORDER BY id_genre", new GenreMapper());
+        return jdbcTemplate.query("SELECT id_genre, name FROM genres ORDER BY id_genre", genreMapper);
     }
 
     @Override
     public Optional<Genre> findById(int id) {
-        Genre genre = jdbcTemplate.query("SELECT id_genre, name FROM genres WHERE id_genre=?",
-                        new GenreMapper(), id)
-                .stream().findAny().orElse(null);
-        if (genre == null) {
-            return Optional.empty();
-        }
-        return Optional.of(genre);
+        return jdbcTemplate.query("SELECT id_genre, name FROM genres WHERE id_genre=?",
+                        genreMapper, id)
+                .stream().findAny();
     }
 
     @Override
@@ -50,7 +47,7 @@ public class GenreDaoImpl implements GenreDao {
     public Set<Genre> getGenres(int filmId) {
         List<Genre> genreList = jdbcTemplate.query("SELECT fg.id_genre, g.name FROM films_genres AS fg "
                 + "LEFT OUTER JOIN genres AS g ON fg.id_genre = g.id_genre "
-                + "WHERE fg.id_film=? ORDER BY g.id_genre ASC", new GenreMapper(), filmId);
+                + "WHERE fg.id_film=? ORDER BY g.id_genre ASC", genreMapper, filmId);
         return new HashSet<>(genreList);
     }
 
@@ -77,16 +74,9 @@ public class GenreDaoImpl implements GenreDao {
 
         jdbcTemplate.query(mainQuery, (rs) -> {
             Film film = filmById.get(rs.getInt("id_film"));
-            Genre genre = makeGenre(rs);
+            Genre genre = genreMapper.mapRow(rs, 0);
             film.addGenre(genre);
         }, films.stream()
                 .map(Film::getId).toArray());
     }
-
-    Genre makeGenre(ResultSet rs) throws SQLException {
-        return new Genre(
-                rs.getInt("id_genre"),
-                rs.getString("name"));
-    }
-
 }

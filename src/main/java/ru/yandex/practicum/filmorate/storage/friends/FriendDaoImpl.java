@@ -11,10 +11,12 @@ import java.util.List;
 public class FriendDaoImpl implements FriendDao {
 
     private final JdbcTemplate jdbcTemplate;
+    private final FriendMapper friendMapper;
 
     @Autowired
-    public FriendDaoImpl(JdbcTemplate jdbcTemplate) {
+    public FriendDaoImpl(JdbcTemplate jdbcTemplate, FriendMapper friendMapper) {
         this.jdbcTemplate = jdbcTemplate;
+        this.friendMapper = friendMapper;
     }
 
     @Override
@@ -29,8 +31,9 @@ public class FriendDaoImpl implements FriendDao {
 
     @Override
     public List<Friend> getFriends(int userId) {
-        return jdbcTemplate.query("SELECT id_friend FROM friends WHERE id_user=? GROUP BY id_friend ORDER BY id_friend",
-                new FriendMapper(), userId);
+        return jdbcTemplate.query("SELECT id_friend FROM friends WHERE id_user=? "
+                        + "GROUP BY id_friend ORDER BY id_friend",
+                friendMapper, userId);
     }
 
 }

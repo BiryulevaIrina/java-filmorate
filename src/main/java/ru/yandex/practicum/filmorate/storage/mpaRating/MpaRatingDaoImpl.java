@@ -6,8 +6,6 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -19,33 +17,31 @@ import static java.util.function.UnaryOperator.identity;
 @Component
 public class MpaRatingDaoImpl implements MpaRatingDao {
     private final JdbcTemplate jdbcTemplate;
+    private final MpaRatingMapper mpaRatingMapper;
 
     @Autowired
-    public MpaRatingDaoImpl(JdbcTemplate jdbcTemplate) {
+    public MpaRatingDaoImpl(JdbcTemplate jdbcTemplate, MpaRatingMapper mpaRatingMapper) {
         this.jdbcTemplate = jdbcTemplate;
+        this.mpaRatingMapper = mpaRatingMapper;
     }
 
     @Override
     public List<Mpa> findAll() {
         return jdbcTemplate.query("SELECT id_mpa_rating, name FROM mpa_ratings ORDER BY id_mpa_rating",
-                new MpaRatingMapper());
+                mpaRatingMapper);
     }
 
     @Override
     public Optional<Mpa> findById(int id) {
-        Mpa mpa = jdbcTemplate.query("SELECT * FROM mpa_ratings WHERE id_mpa_rating=?",
-                        new MpaRatingMapper(), id)
-                .stream().findAny().orElse(null);
-        if (mpa == null) {
-            return Optional.empty();
-        }
-        return Optional.of(mpa);
+        return jdbcTemplate.query("SELECT * FROM mpa_ratings WHERE id_mpa_rating=?",
+                        mpaRatingMapper, id)
+                .stream().findAny();
     }
 
     @Override
     public Mpa getByFilmId(int filmId) {
         return jdbcTemplate.queryForObject("SELECT m.* FROM mpa_ratings AS m INNER JOIN films AS f "
-                + "ON f.id_mpa_rating = m.id_mpa_rating WHERE id_film=?", new MpaRatingMapper(), filmId);
+                + "ON f.id_mpa_rating = m.id_mpa_rating WHERE id_film=?", mpaRatingMapper, filmId);
     }
 
     @Override
@@ -60,16 +56,10 @@ public class MpaRatingDaoImpl implements MpaRatingDao {
 
         jdbcTemplate.query(mainQuery, (rs) -> {
             Film film = filmById.get(rs.getInt("id_film"));
-            Mpa mpa = makeMpa(rs);
+            Mpa mpa = mpaRatingMapper.mapRow(rs, 0);
             film.setMpa(mpa);
         }, films.stream()
                 .map(Film::getId).toArray());
-    }
-
-    Mpa makeMpa(ResultSet rs) throws SQLException {
-        return new Mpa(
-                rs.getInt("id_mpa_rating"),
-                rs.getString("name"));
     }
 
 }

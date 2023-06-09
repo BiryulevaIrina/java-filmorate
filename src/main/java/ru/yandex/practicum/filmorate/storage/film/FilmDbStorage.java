@@ -13,17 +13,19 @@ import java.util.*;
 public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
+    private final FilmMapper filmMapper;
 
     private int id;
 
     @Autowired
-    public FilmDbStorage(JdbcTemplate jdbcTemplate) {
+    public FilmDbStorage(JdbcTemplate jdbcTemplate, FilmMapper filmMapper) {
         this.jdbcTemplate = jdbcTemplate;
+        this.filmMapper = filmMapper;
     }
 
     @Override
     public List<Film> findAll() {
-        return jdbcTemplate.query("SELECT * FROM films", new FilmMapper());
+        return jdbcTemplate.query("SELECT * FROM films", filmMapper);
     }
 
     @Override
@@ -44,13 +46,9 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Optional<Film> findById(int id) {
-        Film film = jdbcTemplate.query("SELECT id_film, name, description, release_date, duration, id_mpa_rating "
-                        + "FROM films WHERE id_film=?", new FilmMapper(), id)
-                .stream().findAny().orElse(null);
-        if (film == null) {
-            return Optional.empty();
-        }
-        return Optional.of(film);
+        return jdbcTemplate.query("SELECT id_film, name, description, release_date, duration, id_mpa_rating "
+                        + "FROM films WHERE id_film=?", filmMapper, id)
+                .stream().findAny();
     }
 
     @Override

@@ -12,10 +12,12 @@ import java.util.List;
 public class LikeDaoImpl implements LikeDao {
 
     private final JdbcTemplate jdbcTemplate;
+    private final FilmMapper filmMapper;
 
     @Autowired
-    public LikeDaoImpl(JdbcTemplate jdbcTemplate) {
+    public LikeDaoImpl(JdbcTemplate jdbcTemplate, FilmMapper filmMapper) {
         this.jdbcTemplate = jdbcTemplate;
+        this.filmMapper = filmMapper;
     }
 
     @Override
@@ -30,6 +32,8 @@ public class LikeDaoImpl implements LikeDao {
 
     @Override
     public List<Film> getPopularFilms(int count) {
-        return jdbcTemplate.query("SELECT f.id_film, f.name, f.description, f.release_date, f.duration, " + "f.id_mpa_rating FROM films AS f LEFT JOIN likes AS l ON f.id_film = l.id_film " + "GROUP BY f.id_film ORDER BY COUNT(l.id_user) DESC LIMIT ?", new FilmMapper(), count);
+        return jdbcTemplate.query("SELECT f.id_film, f.name, f.description, f.release_date, f.duration, "
+                + "f.id_mpa_rating FROM films AS f LEFT JOIN likes AS l ON f.id_film = l.id_film "
+                + "GROUP BY f.id_film ORDER BY COUNT(l.id_user) DESC LIMIT ?", filmMapper, count);
     }
 }
